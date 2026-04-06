@@ -1,0 +1,22 @@
+baseURL: https://dgallitelli.github.io/blog/
+languageCode: en-us
+title: Latent Thoughts
+theme: latent
+
+params:
+  description: "AI, ML, cloud architecture, and engineering — decoded."
+  author: "Davide Gallitelli"
+  mainSections: ["posts"]
+
+caches:
+  images:
+    dir: ":cacheDir/images"
+
+markup:
+  highlight:
+    style: dracula
+    lineNos: false
+    guessSyntax: true
+  goldmark:
+    renderer:
+      unsafe: true

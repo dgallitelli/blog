@@ -1,0 +1,37 @@
+{{ define "main" }}
+<article>
+    <div class="post-header">
+        <h1>{{ .Title }}</h1>
+        <div class="post-meta">
+            <span class="post-date">{{ .Date.Format "Jan 2, 2006" }}</span>
+            <div class="post-tags">
+                {{ range .Params.tags }}<span class="post-tag">{{ . }}</span>{{ end }}
+            </div>
+        </div>
+    </div>
+
+    {{ if .Params.series }}
+    <nav class="series-nav">
+        <div class="series-nav-title">{{ .Params.series }} — series</div>
+        <ol>
+            {{ $currentPage := . }}
+            {{ range where .Site.RegularPages "Params.series" .Params.series }}
+            <li{{ if eq .RelPermalink $currentPage.RelPermalink }} class="current"{{ end }}>
+                {{ if eq .RelPermalink $currentPage.RelPermalink }}
+                    {{ .Title }}
+                {{ else }}
+                    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                {{ end }}
+            </li>
+            {{ end }}
+        </ol>
+    </nav>
+    {{ end }}
+
+    <div class="post-content">
+        {{ .Content }}
+    </div>
+
+    <a href="{{ "/" | absURL }}" class="back-link">← Back to all posts</a>
+</article>
+{{ end }}
