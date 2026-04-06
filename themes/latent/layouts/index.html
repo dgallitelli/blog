@@ -2,11 +2,19 @@
 <section class="hero">
     <h1>{{ .Site.Title }}</h1>
     <p class="hero-subtitle">{{ .Site.Params.description }}</p>
+    <div class="search-wrap">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="search" class="search-input" placeholder="Search posts…" autocomplete="off" aria-label="Search posts">
+        <kbd class="search-kbd">/</kbd>
+    </div>
 </section>
 
-<section class="posts">
+<section class="posts" id="posts">
     {{ range sort (where .Site.RegularPages "Params.hidden" "ne" true) "Date" "desc" }}
-    <a class="post-card" href="{{ .RelPermalink }}">
+    <a class="post-card" href="{{ .RelPermalink }}"
+       data-title="{{ .Title | lower }}"
+       data-tags="{{ delimit .Params.tags "," | lower }}"
+       data-summary="{{ .Params.summary | lower }}">
         <div class="post-meta">
             <span class="post-date">{{ .Date.Format "Jan 2, 2006" }}</span>
             <div class="post-tags">
@@ -18,4 +26,39 @@
     </a>
     {{ end }}
 </section>
+
+<p class="no-results" id="no-results" hidden>No posts match your search.</p>
+
+<script>
+(function() {
+    const input = document.getElementById('search');
+    const posts = document.querySelectorAll('.post-card');
+    const noResults = document.getElementById('no-results');
+
+    input.addEventListener('input', function() {
+        const q = this.value.toLowerCase().trim();
+        let visible = 0;
+        posts.forEach(card => {
+            const haystack = card.dataset.title + ' ' + card.dataset.tags + ' ' + card.dataset.summary;
+            const show = !q || haystack.includes(q);
+            card.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        noResults.hidden = visible > 0;
+    });
+
+    // Focus search on "/" key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === '/' && document.activeElement !== input) {
+            e.preventDefault();
+            input.focus();
+        }
+        if (e.key === 'Escape' && document.activeElement === input) {
+            input.value = '';
+            input.dispatchEvent(new Event('input'));
+            input.blur();
+        }
+    });
+})();
+</script>
 {{ end }}
