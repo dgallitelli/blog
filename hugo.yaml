@@ -5,6 +5,7 @@ theme: latent
 
 params:
   description: "AI, ML, cloud architecture, and engineering — decoded."
+  og_description: "Latent Thoughts by Davide Gallitelli — practical lessons from building production AI/ML systems, deep dives into agentic AI and retrieval systems, and cloud architecture patterns."
   author: "Davide Gallitelli"
   mainSections: ["posts"]
 
