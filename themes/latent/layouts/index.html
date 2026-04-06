@@ -1,7 +1,12 @@
 {{ define "main" }}
 <section class="hero">
-    <h1>{{ .Site.Title }}</h1>
-    <p class="hero-subtitle">{{ .Site.Params.description }}</p>
+    <div class="hero-top">
+        <div class="hero-text">
+            <h1>{{ .Site.Title }}</h1>
+            <p class="hero-subtitle">{{ .Site.Params.description }}</p>
+        </div>
+        <img src="{{ "logo.svg" | absURL }}" alt="" class="hero-logo" aria-hidden="true">
+    </div>
     <div class="search-wrap">
         <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="search" class="search-input" placeholder="Search posts…" autocomplete="off" aria-label="Search posts">

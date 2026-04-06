@@ -116,6 +116,13 @@ a:hover { opacity: 0.85; }
     border-bottom: 1px solid var(--border);
     margin-bottom: 2rem;
 }
+.hero-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+.hero-text { flex: 1; min-width: 0; }
 .hero h1 {
     font-family: var(--font-display);
     font-size: 1.75rem; font-weight: 700;
@@ -128,6 +135,11 @@ a:hover { opacity: 0.85; }
     color: var(--text-muted);
     font-size: 0.95rem;
     animation: fadeSlideIn 0.6s 0.1s ease both;
+}
+.hero-logo {
+    width: 72px; height: 72px;
+    flex-shrink: 0;
+    animation: fadeSlideIn 0.6s 0.15s ease both;
 }
 
 /* ── Search ──────────────────────────────────────────── */
@@ -358,6 +370,7 @@ a:hover { opacity: 0.85; }
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 600px) {
     .hero h1 { font-size: 1.35rem; }
+    .hero-logo { width: 56px; height: 56px; }
     .post-header h1 { font-size: 1.35rem; }
     .post-card { padding: 1rem 1.15rem; }
     .post-title { font-size: 0.95rem; }
