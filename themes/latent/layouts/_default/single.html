@@ -32,6 +32,6 @@
         {{ .Content }}
     </div>
 
-    <a href="{{ "/" | absURL }}" class="back-link">← Back to all posts</a>
+    <a href="{{ .Site.BaseURL }}" class="back-link">← Back to all posts</a>
 </article>
 {{ end }}
