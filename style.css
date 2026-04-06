@@ -79,6 +79,14 @@ a:hover { opacity: 0.8; }
     font-weight: 700;
     color: var(--text-heading);
     letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+}
+
+.site-logo {
+    height: 32px;
+    width: 32px;
+    border-radius: 50%;
 }
 
 .site-nav { display: flex; align-items: center; gap: 1.25rem; }
