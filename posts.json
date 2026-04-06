@@ -4,13 +4,6 @@
         "date": "2026-04-06",
         "slug": "welcome",
         "tags": ["meta"],
-        "summary": "Hello world! This is the first post on my new blog. I'll be writing about AI, ML, cloud architecture, and lessons learned from building production systems at scale."
-    },
-    {
-        "title": "5 Lessons from Building Production Retrieval Systems with AI",
-        "date": "2026-02-24",
-        "slug": "retrieval-systems-lessons",
-        "tags": ["AI", "RAG", "production"],
-        "summary": "Five lessons learned following the path from raw data to end user in production retrieval systems — covering chunking strategies, embedding choices, and evaluation pitfalls."
+        "summary": "Hello world! This is the first post on Latent Thoughts. I'll be writing about AI, ML, cloud architecture, and lessons learned from building production systems at scale."
     }
 ]

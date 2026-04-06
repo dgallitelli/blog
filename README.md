@@ -1,6 +1,6 @@
-# Davide Gallitelli — Blog
+# Latent Thoughts
 
-Personal blog hosted on GitHub Pages at [dgallitelli.github.io/blog](https://dgallitelli.github.io/blog).
+Davide Gallitelli's personal blog, hosted on GitHub Pages at [dgallitelli.github.io/blog](https://dgallitelli.github.io/blog).
 
 ## Adding a new post
 
