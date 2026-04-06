@@ -15,7 +15,7 @@
         <div class="series-nav-title">{{ .Params.series }} — series</div>
         <ol>
             {{ $currentPage := . }}
-            {{ range where .Site.RegularPages "Params.series" .Params.series }}
+            {{ range sort (where .Site.RegularPages "Params.series" .Params.series) "Date" "asc" }}
             <li{{ if eq .RelPermalink $currentPage.RelPermalink }} class="current"{{ end }}>
                 {{ if eq .RelPermalink $currentPage.RelPermalink }}
                     {{ .Title }}
