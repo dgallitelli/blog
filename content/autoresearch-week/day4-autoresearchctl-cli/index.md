@@ -21,7 +21,7 @@ It's a pip-installable CLI that bakes the seven principles from Day 3, the dual 
 Every implementation this week required a different setup. The SageMaker version needs AWS credentials and a GPU fleet. The Kiro Power needs Kiro. If you just want to try the pattern on a docs folder or a system prompt, you need something simpler.
 
 ```bash
-pip install autoresearchctl
+pip install git+https://github.com/dgallitelli/autoresearchctl.git
 autoresearchctl init
 # edit .autoresearch/config.yaml
 autoresearchctl run --cycles 10

@@ -93,7 +93,7 @@ No LLM judge needed. Every criterion is a shell command.
 
 The initial state has real problems: missing meta descriptions, titles over 60 characters, multiple H1 headings, pages with no internal links. Here's the per-doc breakdown:
 
-| Doc | title | desc | h1 | links |
+| Doc | title_length | meta_desc | single_h1 | internal_links |
 |---|---|---|---|---|
 | advanced-config.md | ✅ | ❌ | ❌ | ❌ |
 | api-reference.md | ❌ | ❌ | ❌ | ❌ |

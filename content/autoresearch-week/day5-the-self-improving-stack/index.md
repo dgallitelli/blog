@@ -99,28 +99,36 @@ Here's my thesis: **the teams that win in the agentic era won't be the ones with
 When you zoom out from individual tools, a layered architecture emerges:
 
 ```mermaid
-block-beta
-    columns 1
-    block:runtime["Runtime"]
-        r1["autoresearchctl"] r2["Kiro Power"] r3["Step Functions"] r4["SageMaker"]
+flowchart TD
+    subgraph Runtime["🔧 Runtime"]
+        r1["autoresearchctl"]
+        r2["Kiro Power"]
+        r3["Step Functions"]
+        r4["SageMaker"]
     end
-    block:gov["Governance"]
-        g1["Budget caps"] g2["Plateau detection"] g3["Rollback"] g4["Audit trails"]
+    subgraph Governance["🛡️ Governance"]
+        g1["Budget caps"]
+        g2["Plateau detection"]
+        g3["Rollback"]
+        g4["Audit trails"]
     end
-    block:opt["Optimization"]
-        o1["Mutate"] o2["Evaluate"] o3["Keep / Revert"] o4["Repeat"]
+    subgraph Optimization["🔄 Optimization"]
+        o1["Mutate → Evaluate → Keep / Revert → Repeat"]
     end
-    block:eval["Evals"]
-        e1["Command evals"] e2["LLM judge evals"] e3["Binary: YES / NO"]
+    subgraph Evals["📏 Evals"]
+        e1["Command evals"]
+        e2["LLM judge evals"]
+        e3["Binary: YES / NO"]
     end
-    block:art["Artifacts"]
-        a1["Docs"] a2["Prompts"] a3["Configs"] a4["Skills"] a5["Code"]
+    subgraph Artifacts["📄 Artifacts"]
+        a1["Docs"]
+        a2["Prompts"]
+        a3["Configs"]
+        a4["Skills"]
+        a5["Code"]
     end
 
-    runtime --> gov
-    gov --> opt
-    opt --> eval
-    eval --> art
+    Runtime --> Governance --> Optimization --> Evals --> Artifacts
 ```
 
 Runtime at the foundation. Governance wraps optimization. Optimization is driven by evals. Evals judge artifacts. Each layer constrains the one above it: governance stops the loop when budget is exhausted, evals revert changes that fail criteria.
@@ -145,7 +153,7 @@ The eval criteria — the binary gates that determine what "better" means — ar
 
 This is true at every layer of the stack. Better criteria produce better artifacts. Better governance produces trustworthy optimization. Better runtime produces faster iteration. But it all starts with the eval.
 
-If you want to try the pattern this weekend: `pip install autoresearchctl`, define 3-5 binary criteria for any file in your project, and run 10 cycles (see [Day 4](../day4-autoresearchctl-cli/) for the full walkthrough). Look at what the loop changes — the mutations reveal quality dimensions you didn't know you cared about.
+If you want to try the pattern this weekend: `pip install git+https://github.com/dgallitelli/autoresearchctl.git`, define 3-5 binary criteria for any file in your project, and run 10 cycles (see [Day 4](../day4-autoresearchctl-cli/) for the full walkthrough). Look at what the loop changes — the mutations reveal quality dimensions you didn't know you cared about.
 
 It's turtles all the way down — except at the bottom, there's a human deciding what matters.
 
