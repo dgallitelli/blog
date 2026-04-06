@@ -30,7 +30,33 @@ If you've used SageMaker Training Jobs before, the primitives aren't new to you.
 
 The design is deliberately minimal:
 
-![SageMaker autoresearch architecture](/blog/diagrams/day2-architecture.png)
+```mermaid
+flowchart TD
+    subgraph Agent["AI Agent (Claude Code / Kiro / Codex)"]
+        A1["Read program.md"] --> A2["Mutate train.py"]
+        A2 --> A3["Call orchestrator CLI"]
+        A3 --> A4["Interpret results"]
+        A4 --> A5["Keep or revert"]
+    end
+
+    subgraph Orch["orchestrator.py — Stateless CLI"]
+        O1["prepare"]
+        O2["launch"]
+        O3["results"]
+    end
+
+    subgraph SM["Amazon SageMaker"]
+        S1["Processing Job\nData tokenization"]
+        S2["Training Job(s)\nWarm pools enabled"]
+        S3["CloudWatch Logs\nResults parsing"]
+    end
+
+    A3 --> O2
+    O1 --> S1
+    O2 --> S2
+    O3 --> S3
+    S2 --> S3
+```
 
 ```
 sagemaker-autoresearch/
@@ -114,20 +140,21 @@ TOTAL                                       $0.25
 
 Here's where the SageMaker version diverges from Karpathy's sequential ratchet. Instead of testing one idea at a time, we launch three competing hypotheses simultaneously.
 
-![Experiment results comparison](/blog/diagrams/day2-experiment-results.png)
+```mermaid
+xychart-beta
+    title "Parallel Hypothesis Results (val_bpb, lower is better)"
+    x-axis ["Baseline 4L/256d", "Wider 512d/8h", "Deeper 8L/256d", "Faster 2x batch+LR"]
+    y-axis "val_bpb" 3.0 --> 4.0
+    bar [3.408, 3.595, 3.824, 3.287]
+```
 
 The hypotheses:
 
-```
-Hypothesis    Change                  Rationale
------------------------------------------------------
-wider         d_model 256->512,       SkyPilot found width
-              n_heads 4->8            matters most
-deeper        depth 4->8              More layers, same width
-              (same d_model)          -- does depth help?
-faster        2x batch, 2x LR        Chinchilla-style: see
-                                      more tokens per step
-```
+| Hypothesis | Change | Rationale |
+|---|---|---|
+| wider | d_model 256→512, n_heads 4→8 | SkyPilot found width matters most |
+| deeper | depth 4→8 (same d_model) | More layers, same width — does depth help? |
+| faster | 2x batch, 2x LR | Chinchilla-style: see more tokens per step |
 
 Each variant gets its own directory with a modified `hyperparams.yaml`:
 
@@ -197,17 +224,15 @@ At $0.25 per experiment, 100 overnight runs cost $25. Human iteration speed was 
 
 ## Comparing to the Original
 
-```
-Aspect           Karpathy         SageMaker
-------------------------------------------------
-Compute          Local 1 GPU      Any SM instance
-Parallelism      Sequential       N jobs at once
-Data prep        Local script     Processing Job
-Cost visibility  Electricity      Per-job estimate
-Warm pools       N/A              30-min keep-alive
-Startup          Instant          ~2m cold / <30s warm
-Agent coupling   Tight (uv run)   Loose (CLI wrapper)
-```
+| Aspect | Karpathy | SageMaker |
+|---|---|---|
+| Compute | Local 1 GPU | Any SM instance |
+| Parallelism | Sequential | N jobs at once |
+| Data prep | Local script | Processing Job |
+| Cost visibility | Electricity | Per-job estimate |
+| Warm pools | N/A | 30-min keep-alive |
+| Startup | Instant | ~2m cold / <30s warm |
+| Agent coupling | Tight (uv run) | Loose (CLI wrapper) |
 
 The core philosophy is preserved: the AI agent IS the research loop. The orchestrator is a tool, not a framework. It doesn't make decisions — it wraps API complexity the same way `uv run train.py` wraps local execution.
 

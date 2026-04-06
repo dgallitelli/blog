@@ -16,13 +16,37 @@ I've spent the last two weeks building on top of this pattern — porting it to 
 
 Autoresearch is three files and a loop.
 
-![The three files: program.md, train.py, and results.tsv](/blog/diagrams/day1-three-files.png)
+```mermaid
+flowchart LR
+    subgraph Human
+        P["program.md\nGoals, taste,\nconstraints"]
+    end
+    subgraph Agent
+        T["train.py\nModel, optimizer,\nhyperparams"]
+        R["results.tsv\nAll experiments,\npass or fail"]
+    end
+    P -->|"design\nthe arena"| T
+    T -->|"mutate, run 5min,\nextract val_bpb"| R
+    R -->|"inform\nnext move"| T
+```
 
 **`program.md`** is what Karpathy calls the "research org code." The human defines the optimization objective, constraints, and research taste in plain Markdown. **`train.py`** is the only file the agent can touch — a complete GPT training script. **`results.tsv`** tracks every experiment, pass or fail.
 
 The loop is a ratchet: the agent mutates `train.py`, commits to git, runs for exactly 5 minutes, and checks `val_bpb` (validation bits per byte). Improved? Keep the commit. Regressed or crashed? `git reset --hard HEAD~1`. Repeat ~100 times overnight. The codebase monotonically improves.
 
-![The ratchet loop: mutate, run, evaluate, keep or revert](/blog/diagrams/day1-ratchet-loop.png)
+```mermaid
+flowchart TD
+    A["Read program.md\n+ results.tsv"] --> B["Generate hypothesis"]
+    B --> C["Modify train.py"]
+    C --> D["Commit to git"]
+    D --> E["Run 5 min"]
+    E --> F{"val_bpb\nimproved?"}
+    F -->|"Yes"| G["Keep commit\nUpdate frontier"]
+    F -->|"No / Crash"| H["git reset --hard\nRevert"]
+    G --> I["Append to\nresults.tsv"]
+    H --> I
+    I --> A
+```
 
 The taste comes from `program.md`:
 

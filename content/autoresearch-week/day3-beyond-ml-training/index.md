@@ -44,16 +44,14 @@ The Kiro Power implements the pattern as four phases:
 
 The loop uses six named mutation operators, rotating in fixed order:
 
-```
-Operator              What it does
-----------------------------------------------------
-add_constraint        Add a specific rule or requirement
-add_negative_example  Show what NOT to do
-add_counterexample    Before/after pair (wrong -> right)
-tighten_language      Replace vague with precise
-remove_bloat          Cut redundant content
-restructure           Reorder, reformat, change flow
-```
+| Operator | What it does |
+|---|---|
+| `add_constraint` | Add a specific rule or requirement |
+| `add_negative_example` | Show what NOT to do |
+| `add_counterexample` | Before/after pair (wrong → right) |
+| `tighten_language` | Replace vague with precise |
+| `remove_bloat` | Cut redundant content |
+| `restructure` | Reorder, reformat, change flow |
 
 One operator per cycle. One change at a time. This is the single-mutation rule from the original autoresearch — it enables clean attribution of what caused improvement or regression.
 
@@ -61,7 +59,16 @@ One operator per cycle. One change at a time. This is the single-mutation rule f
 
 The generalized pattern supports two eval types, and the choice matters:
 
-![Evaluation types: command evals vs LLM judge evals](/blog/diagrams/day3-eval-types.png)
+```mermaid
+flowchart TD
+    C["Criterion"] --> D{"Type?"}
+    D -->|"command"| E["Shell command\nexit 0 = PASS"]
+    D -->|"llm_judge"| F["LLM call\nYES or NO"]
+    E --> G["Deterministic\nFree, fast"]
+    F --> H["Requires understanding\nIsolated: no optimization context"]
+    G --> I["Score = count of PASS\nacross criteria × files"]
+    H --> I
+```
 
 **Command evals** run shell commands. `grep -c '^# ' doc.md` checks heading count. `wc -w < review.txt` checks word count. Exit code 0 = pass. These are deterministic, free, and fast. Same input always gives same result.
 
@@ -73,14 +80,12 @@ The rule: **command evals over LLM evals, always.** Use LLM judges only when no 
 
 Let me make this concrete. I have 10 Markdown documentation pages with YAML frontmatter — a typical docs site. The goal: optimize them for SEO compliance using four command-based criteria:
 
-```
-Criterion          Type      Check
-----------------------------------------------------
-title_length       command   Title under 60 chars
-meta_description   command   Description 120-160 chars
-single_h1          command   Exactly one H1 heading
-internal_links     command   At least one .md link
-```
+| Criterion | Type | Check |
+|---|---|---|
+| `title_length` | command | Title under 60 chars |
+| `meta_description` | command | Description 120-160 chars |
+| `single_h1` | command | Exactly one H1 heading |
+| `internal_links` | command | At least one .md link |
 
 No LLM judge needed. Every criterion is a shell command.
 
@@ -88,24 +93,28 @@ No LLM judge needed. Every criterion is a shell command.
 
 The initial state has real problems: missing meta descriptions, titles over 60 characters, multiple H1 headings, pages with no internal links. Here's the per-doc breakdown:
 
-```
-Doc                     title  desc    h1  links
--------------------------------------------------
-advanced-config.md      PASS   FAIL  FAIL   FAIL
-api-reference.md        FAIL   FAIL  FAIL   FAIL
-configuration.md        FAIL   PASS  PASS   FAIL
-deployment.md           FAIL   FAIL  PASS   PASS
-faq.md                  PASS   PASS  PASS   FAIL
-getting-started.md      PASS   PASS  PASS   PASS
-installation.md         PASS   PASS  PASS   PASS
-migration-guide.md      FAIL   FAIL  PASS   FAIL
-troubleshooting.md      PASS   FAIL  FAIL   PASS
-tutorial.md             PASS   FAIL  PASS   PASS
-```
+| Doc | title | desc | h1 | links |
+|---|---|---|---|---|
+| advanced-config.md | ✅ | ❌ | ❌ | ❌ |
+| api-reference.md | ❌ | ❌ | ❌ | ❌ |
+| configuration.md | ❌ | ✅ | ✅ | ❌ |
+| deployment.md | ❌ | ❌ | ✅ | ✅ |
+| faq.md | ✅ | ✅ | ✅ | ❌ |
+| getting-started.md | ✅ | ✅ | ✅ | ✅ |
+| installation.md | ✅ | ✅ | ✅ | ✅ |
+| migration-guide.md | ❌ | ❌ | ✅ | ❌ |
+| troubleshooting.md | ✅ | ❌ | ❌ | ✅ |
+| tutorial.md | ✅ | ❌ | ✅ | ✅ |
 
 I ran the loop for 5 cycles. Here's what happened:
 
-![Documentation SEO optimization progress over 5 cycles](/blog/diagrams/day3-docs-seo-progress.png)
+```mermaid
+xychart-beta
+    title "Docs-SEO Optimization Progress (score out of 40)"
+    x-axis ["Baseline", "Cycle 1", "Cycle 2", "Cycle 3", "Cycle 4", "Cycle 5"]
+    y-axis "Score" 0 --> 40
+    bar [22, 24, 24, 27, 29, 30]
+```
 
 ```
 Cycle  Operator              Score  Status
@@ -144,15 +153,13 @@ The docs-SEO demo used only command evals. But many domains require LLM judges �
 
 The repo includes a second test case for this: a code review bot prompt optimized against 10 vulnerable code snippets (SQL injection, XSS, race conditions, auth bypasses). Five of six criteria use LLM judges:
 
-```
-Criterion              Type       Check
----------------------------------------------------
-consistent_format      LLM judge  Structured sections
-identifies_real_bug    LLM judge  Finds genuine bug
-no_hallucinated_apis   LLM judge  No invented APIs
-actionable_suggestions LLM judge  Specific fixes
-under_token_budget     command    Under 500 words
-```
+| Criterion | Type | Check |
+|---|---|---|
+| `consistent_format` | LLM judge | Structured sections |
+| `identifies_real_bug` | LLM judge | Finds genuine bug |
+| `no_hallucinated_apis` | LLM judge | No invented APIs |
+| `actionable_suggestions` | LLM judge | Specific fixes |
+| `under_token_budget` | command | Under 500 words |
 
 The key design constraint: the judge sees ONLY the review output plus the criterion question. It doesn't know about the system prompt being optimized. It doesn't know what cycle we're on. It answers YES or NO, nothing else. This isolation prevents charitable grading — the failure mode that plagued my early attempts before I learned principle #3.
 

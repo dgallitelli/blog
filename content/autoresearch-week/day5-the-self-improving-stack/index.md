@@ -22,29 +22,38 @@ Yesterday's `autoresearchctl` works great for a developer at a terminal. It does
 
 The platform is a serverless architecture on AWS that wraps the same loop in a dashboard:
 
-```
-+-----------------------------------------+
-|  React SPA (S3 + CloudFront)            |
-|  Dashboard | Project Wizard | Detail    |
-+--------------------+--------------------+
-                     |
-                     v
-+--------------------+--------------------+
-|  API Gateway (REST) + JWT auth          |
-+--------------------+--------------------+
-                     |
-                     v
-+--------------------+--------------------+
-|  Step Functions State Machine           |
-|  Init -> Reason -> Execute -> Evaluate  |
-|  Budget check per iteration             |
-+--------------------+--------------------+
-                     |
-                     v
-+--------------------+--------------------+
-|  DynamoDB (metadata, cost ledger)       |
-|  S3 (variants) | Git (commits, PRs)    |
-+--------------------+--------------------+
+```mermaid
+flowchart TD
+    subgraph Frontend["React SPA (S3 + CloudFront)"]
+        UI1["Dashboard"]
+        UI2["Project Wizard"]
+        UI3["Experiment Detail"]
+    end
+
+    subgraph API["API Gateway (REST) + JWT Auth"]
+        A1["Auth"]
+        A2["Projects"]
+        A3["Control"]
+    end
+
+    subgraph Orchestration["Step Functions State Machine"]
+        SF1["Init\nClone repo"] --> SF2["Reason\nBedrock / Claude"]
+        SF2 --> SF3["Execute\nMap(1-5) Lambda"]
+        SF3 --> SF4["Evaluate\nBest variant"]
+        SF4 --> SF5{"Budget\nOK?"}
+        SF5 -->|"Yes"| SF2
+        SF5 -->|"No"| SF6["Create PR\nSummary + cost"]
+    end
+
+    subgraph Storage
+        D1["DynamoDB\nMetadata + Cost Ledger"]
+        D2["S3\nVariants + artifacts"]
+        D3["Git\nCommits + PRs"]
+    end
+
+    Frontend --> API
+    API --> Orchestration
+    Orchestration --> Storage
 ```
 
 Everything serverless. You pay only when experiments are running.
@@ -73,16 +82,13 @@ This platform is a design document, not a shipped product — I'm publishing the
 
 Day 1 identified five gaps in Karpathy's autoresearch. Here's where they stand:
 
-```
-Gap                Day   Status
----------------------------------------------------
-1. Fleet compute   2     Shipped (SageMaker)
-2. Cost visibility 2     Shipped (per-job estimates)
-3. Parallelism     2     Shipped (N-job parallel)
-4. Governance      4+5   Partial (CLI safeguards
-                         shipped, Cost Ledger designed)
-5. Generalization  3     Shipped (binary criteria)
-```
+| Gap | Day | Status |
+|---|---|---|
+| 1. Fleet compute | 2 | ✅ Shipped (SageMaker) |
+| 2. Cost visibility | 2 | ✅ Shipped (per-job estimates) |
+| 3. Parallelism | 2 | ✅ Shipped (N-job parallel) |
+| 4. Governance | 4+5 | 🔶 Partial (CLI safeguards shipped, Cost Ledger designed) |
+| 5. Generalization | 3 | ✅ Shipped (binary criteria) |
 
 Four shipped, one designed. Honest accounting. But closing gaps isn't the point. The point is what the pattern enables at scale.
 
@@ -92,23 +98,29 @@ Here's my thesis: **the teams that win in the agentic era won't be the ones with
 
 When you zoom out from individual tools, a layered architecture emerges:
 
-```
-Layer          What it does
----------------------------------------------------
-Runtime        Where it runs (autoresearchctl,
-               Kiro Power, Step Functions, SageMaker)
+```mermaid
+block-beta
+    columns 1
+    block:runtime["Runtime"]
+        r1["autoresearchctl"] r2["Kiro Power"] r3["Step Functions"] r4["SageMaker"]
+    end
+    block:gov["Governance"]
+        g1["Budget caps"] g2["Plateau detection"] g3["Rollback"] g4["Audit trails"]
+    end
+    block:opt["Optimization"]
+        o1["Mutate"] o2["Evaluate"] o3["Keep / Revert"] o4["Repeat"]
+    end
+    block:eval["Evals"]
+        e1["Command evals"] e2["LLM judge evals"] e3["Binary: YES / NO"]
+    end
+    block:art["Artifacts"]
+        a1["Docs"] a2["Prompts"] a3["Configs"] a4["Skills"] a5["Code"]
+    end
 
-Governance     What constrains the loop (budgets,
-               plateau detection, rollback, audits)
-
-Optimization   How artifacts improve (autoresearch
-               loop: mutate -> evaluate -> keep)
-
-Evals          How we measure quality (binary
-               criteria, command + LLM judge)
-
-Artifacts      What you optimize (docs, prompts,
-               configs, skills, code)
+    runtime --> gov
+    gov --> opt
+    opt --> eval
+    eval --> art
 ```
 
 Runtime at the foundation. Governance wraps optimization. Optimization is driven by evals. Evals judge artifacts. Each layer constrains the one above it: governance stops the loop when budget is exhausted, evals revert changes that fail criteria.

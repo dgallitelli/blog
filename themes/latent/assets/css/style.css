@@ -156,6 +156,10 @@ a:hover { opacity: 0.8; }
 .series-nav li.current { color: var(--text-heading); font-weight: 600; }
 .series-nav li a { text-decoration: none; }
 
+/* ── Mermaid Diagrams ─────────────────────────────────── */
+.mermaid { margin: 1.5rem 0; text-align: center; overflow-x: auto; }
+.mermaid svg { max-width: 100%; height: auto; }
+
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 600px) {
     .hero h1 { font-size: 1.5rem; }

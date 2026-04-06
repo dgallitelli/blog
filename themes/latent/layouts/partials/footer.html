@@ -3,6 +3,25 @@
         <p>&copy; {{ now.Year }} {{ .Site.Params.author }}</p>
     </div>
 </footer>
+{{ if .Store.Get "hasMermaid" }}
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+        primaryColor: '#1e293b',
+        primaryTextColor: '#e0e0e0',
+        primaryBorderColor: '#6cb4ee',
+        lineColor: '#6cb4ee',
+        secondaryColor: '#141414',
+        tertiaryColor: '#1a1a2e',
+        fontFamily: 'Inter, sans-serif',
+        fontSize: '14px'
+    }
+});
+</script>
+{{ end }}
 <script>
 (function () {
     const root = document.documentElement;
