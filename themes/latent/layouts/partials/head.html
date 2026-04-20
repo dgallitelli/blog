@@ -7,6 +7,7 @@
 {{ with .Params.summary }}{{ $desc = . }}{{ end }}
 {{ with .Description }}{{ $desc = . }}{{ end }}
 <meta name="description" content="{{ $desc }}">
+<meta name="author" content="Davide Gallitelli">
 
 {{/* OpenGraph */}}
 <meta property="og:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }}{{ end }}">
@@ -36,3 +37,8 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 {{ $style := resources.Get "css/style.css" }}
 <link rel="stylesheet" href="{{ $style.RelPermalink }}">
+
+{{/* Plotly.js — loaded only when front matter has plotly: true */}}
+{{ if .Params.plotly }}
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+{{ end }}
