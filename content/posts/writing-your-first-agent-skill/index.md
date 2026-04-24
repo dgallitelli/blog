@@ -7,7 +7,7 @@ summary: "Agent skills are the portable plugin format that works across Claude C
 
 *Agent skills are the portable plugin format that works across Claude Code, GitHub Copilot, Strands Agents, and dozens more. Here's how to write one, wire it into a Strands agent, and register it in AWS Agent Registry so your whole org can discover it.*
 
-*This post comes with a [companion Jupyter notebook](writing-your-first-agent-skill.ipynb) that validates every code example end-to-end — from creating a skill to loading it from the registry via MCP.*
+*This post comes with a [companion Jupyter notebook](https://gist.github.com/dgallitelli/e2a85a391a8cdf63661e21314fc3d4a5) that validates every code example end-to-end — from creating a skill to loading it from the registry via MCP.*
 
 ![A toolbox filled with colorful precision instruments on a workshop table](https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=1200&auto=format&fit=crop&q=80)
 *Photo by [Todd Quackenbush](https://unsplash.com/@toddquackenbush) on [Unsplash](https://unsplash.com)*
