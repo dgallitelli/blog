@@ -1,0 +1,38 @@
+{
+  "data": [
+    {
+      "name": "g7e.2xl vLLM FP8",
+      "type": "bar",
+      "x": ["Short<br>(11 tok in, 50 out)", "Medium<br>(~1K tok in, 256 out)", "Long<br>(~16K tok in, 2048 out)"],
+      "y": [44.82, 5.58, 0.06],
+      "marker": {
+        "color": ["#00d2a0", "#00a080", "#006050"]
+      },
+      "text": ["<b>44.82</b>", "5.58", "0.06"],
+      "textposition": "outside",
+      "textfont": {"size": 15, "color": "#c9d1d9"},
+      "hovertemplate": "<b>%{x}</b><br>%{y:.2f} req/s<extra></extra>",
+      "width": 0.5
+    }
+  ],
+  "layout": {
+    "title": {"text": "Throughput vs Context Length — g7e.2xl vLLM FP8", "font": {"size": 16}},
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {"color": "#c9d1d9", "size": 13},
+    "xaxis": {"tickfont": {"size": 13}, "gridcolor": "rgba(128,128,128,0.15)"},
+    "yaxis": {
+      "title": {"text": "Peak Throughput (req/s)"},
+      "type": "log",
+      "gridcolor": "rgba(128,128,128,0.15)",
+      "zeroline": false,
+      "dtick": 1,
+      "range": [-1.5, 2]
+    },
+    "margin": {"t": 80, "b": 80, "l": 60, "r": 30},
+    "annotations": [
+      {"x": 0.5, "y": 0.35, "xref": "paper", "yref": "paper", "text": "8x drop", "showarrow": true, "ax": 0, "ay": -40, "arrowhead": 2, "arrowcolor": "#ff6b6b", "font": {"color": "#ff6b6b", "size": 14}},
+      {"x": 1.5, "y": 0.12, "xref": "paper", "yref": "paper", "text": "93x drop", "showarrow": true, "ax": 0, "ay": -40, "arrowhead": 2, "arrowcolor": "#ff6b6b", "font": {"color": "#ff6b6b", "size": 14}}
+    ]
+  }
+}

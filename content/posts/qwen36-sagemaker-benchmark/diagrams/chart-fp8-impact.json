@@ -1,0 +1,43 @@
+{
+  "data": [
+    {
+      "name": "FP16",
+      "type": "bar",
+      "x": ["g6e.24xl<br>(4x L40S, TP=4)", "g7e.2xl<br>(1x RTX PRO 6000, TP=1)"],
+      "y": [19.82, 20.15],
+      "marker": {"color": "rgba(201,209,217,0.4)", "line": {"color": "#c9d1d9", "width": 1}},
+      "text": ["19.82", "20.15"],
+      "textposition": "outside",
+      "textfont": {"size": 14, "color": "#c9d1d9"},
+      "hovertemplate": "<b>%{x}</b><br>FP16: %{y:.2f} req/s<extra></extra>"
+    },
+    {
+      "name": "FP8",
+      "type": "bar",
+      "x": ["g6e.24xl<br>(4x L40S, TP=4)", "g7e.2xl<br>(1x RTX PRO 6000, TP=1)"],
+      "y": [20.19, 44.82],
+      "marker": {"color": "#00d2a0", "line": {"color": "#00a080", "width": 1}},
+      "text": ["20.19", "44.82"],
+      "textposition": "outside",
+      "textfont": {"size": 14, "color": "#00d2a0"},
+      "hovertemplate": "<b>%{x}</b><br>FP8: %{y:.2f} req/s<extra></extra>"
+    }
+  ],
+  "layout": {
+    "title": {"text": "FP8 vs FP16 — Same Hardware, Different Impact", "font": {"size": 16}},
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {"color": "#c9d1d9", "size": 13},
+    "barmode": "group",
+    "xaxis": {"tickfont": {"size": 13}, "gridcolor": "rgba(128,128,128,0.15)"},
+    "yaxis": {"title": {"text": "Peak Throughput (req/s)"}, "gridcolor": "rgba(128,128,128,0.15)", "range": [0, 52], "zeroline": false},
+    "legend": {"orientation": "h", "y": 1.02, "x": 0.5, "xanchor": "center", "yanchor": "bottom", "font": {"size": 13}},
+    "margin": {"t": 80, "b": 80, "l": 60, "r": 30},
+    "bargap": 0.25,
+    "bargroupgap": 0.1,
+    "annotations": [
+      {"x": "g6e.24xl<br>(4x L40S, TP=4)", "y": 22, "text": "+2%", "showarrow": false, "font": {"color": "#888", "size": 16}, "xshift": 0},
+      {"x": "g7e.2xl<br>(1x RTX PRO 6000, TP=1)", "y": 48, "text": "<b>+122%</b>", "showarrow": false, "font": {"color": "#00d2a0", "size": 18}, "xshift": 0}
+    ]
+  }
+}

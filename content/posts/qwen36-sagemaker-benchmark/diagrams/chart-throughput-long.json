@@ -1,0 +1,54 @@
+{
+  "data": [
+    {
+      "x": [1, 4, 8, 16, 32, 64, 128],
+      "y": [0.35, 1.12, 2.13, 3.34, 4.66, 5.51, 5.58],
+      "mode": "lines+markers",
+      "name": "g7e.2xl vLLM FP8",
+      "line": {"color": "#00d2a0", "width": 3.5},
+      "marker": {"size": 10, "symbol": "diamond"},
+      "hovertemplate": "<b>Concurrency %{x}</b><br>%{y:.2f} req/s<extra>g7e.2xl vLLM FP8</extra>"
+    },
+    {
+      "x": [1, 4, 8, 16, 32, 64],
+      "y": [0.38, 0.83, 1.17, 1.49, 1.61, 1.73],
+      "mode": "lines+markers",
+      "name": "g6e.24xl vLLM FP8",
+      "line": {"color": "#ff6b6b", "width": 2, "dash": "dash"},
+      "marker": {"size": 7, "symbol": "square"},
+      "hovertemplate": "<b>Concurrency %{x}</b><br>%{y:.2f} req/s<extra>g6e.24xl vLLM FP8</extra>"
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "Throughput Scaling — Long Prompt (~1K tokens in, 256 out)",
+      "font": {"size": 16}
+    },
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {"color": "#c9d1d9", "size": 13},
+    "xaxis": {
+      "title": {"text": "Concurrency"},
+      "type": "log",
+      "tickvals": [1, 2, 4, 8, 16, 32, 64, 128],
+      "ticktext": ["1", "2", "4", "8", "16", "32", "64", "128"],
+      "gridcolor": "rgba(128,128,128,0.15)",
+      "zeroline": false
+    },
+    "yaxis": {
+      "title": {"text": "Requests / second"},
+      "gridcolor": "rgba(128,128,128,0.15)",
+      "zeroline": false
+    },
+    "legend": {
+      "orientation": "h",
+      "yanchor": "bottom",
+      "y": -0.3,
+      "xanchor": "center",
+      "x": 0.5,
+      "font": {"size": 12}
+    },
+    "hovermode": "x unified",
+    "margin": {"t": 60, "b": 100, "l": 70, "r": 30}
+  }
+}
