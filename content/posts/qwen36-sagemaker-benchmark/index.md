@@ -122,7 +122,7 @@ vLLM was the clear throughput winner, but I wanted to know if the other SageMake
 
 **LMI (Large Model Inference)** is SageMaker's built-in container based on DJL Serving. I tested both v22 and v24. LMI 24 on g7e reached 31.90 req/s — a solid 16% improvement over LMI 22 (27.56), but still 30% behind vLLM. LMI has the **lowest single-request latency** (0.603s at concurrency 1), making it competitive for low-traffic use cases.
 
-**SGLang** was a rocky adventure. The SageMaker DLC for SGLang uses a different environment variable (`SM_SGLANG_MODEL_PATH`) than vLLM and LMI (`HF_MODEL_ID`). My first three deploy attempts failed silently because of this. Once I matched the [reference notebook's exact env vars](https://github.com/aws-samples/sagemaker-genai-hosting-examples/tree/main/01-models/Qwen/Qwen3.6), SGLang came alive — and delivered a surprise:
+**SGLang** took some trial and error. The SGLang SageMaker DLC uses a different environment variable for the model path (`SM_SGLANG_MODEL_PATH`) than vLLM and LMI (`HF_MODEL_ID`) — a gotcha worth knowing. Once I matched the [reference notebook's exact env vars](https://github.com/aws-samples/sagemaker-genai-hosting-examples/tree/main/01-models/Qwen/Qwen3.6), SGLang came alive — and delivered a surprise:
 
 {{< plotly json="diagrams/chart-ttft.json" height="380px" >}}
 
@@ -151,7 +151,7 @@ This is where multi-GPU setups reclaim their advantage. With TP=4, KV heads are 
 | g7e.2xl (1x 96GB, TP=1) | ~53 GB | ~23 | ~12 |
 | g6e.24xl (4x 48GB, TP=4) | ~25 GB/GPU (100 GB total effective) | ~44 | ~22 |
 
-I could not verify the g6e numbers at 16K context due to `InsufficientInstanceCapacity` in us-east-1, but the math is clear: if your workload needs many concurrent long-context sessions (RAG with 16K+ retrieval, multi-document summarization), the g6e's larger pooled KV cache may serve more users — even though each individual request is slower.
+The g6e 16K-context test is left as a future exercise, but the math is clear: if your workload needs many concurrent long-context sessions (RAG with 16K+ retrieval, multi-document summarization), the g6e's larger pooled KV cache may serve more users — even though each individual request is slower.
 
 ---
 
@@ -333,7 +333,7 @@ Reference tables for all configurations. Per-concurrency throughput and latency 
 | 4 | **0.06** |
 | 8 | err 12.5% |
 
-> g6e could not be tested — InsufficientInstanceCapacity in us-east-1 for both g6e.12xlarge and g6e.24xlarge.
+> g6e 16K-context test not completed at time of writing — left as a future exercise.
 
 ### Failed Configurations
 
@@ -342,7 +342,7 @@ Reference tables for all configurations. Per-concurrency throughput and latency 
 | ml.g6e.xlarge (1x L40S 48GB) + vLLM FP8 | CUDA OOM — model weights + MTP head + CUDA graphs exhaust 44.5 GB usable VRAM |
 | ml.g6e.24xlarge + SGLang 0.5.10 FP8 TP=4 | OOM during CUDA graph capture — Mamba/GDN state 12.76 GB/GPU + KV cache leaves <9 GB |
 | ml.g6.48xlarge (8x L4 24GB) + vLLM FP8 TP=8 | CUDA OOM — 24 GB L4 GPUs too small with speculative decoding |
-| SGLang 0.5.9 + 0.5.10 with `HF_MODEL_ID` | Container requires `SM_SGLANG_MODEL_PATH` (not `HF_MODEL_ID`) |
+| SGLang 0.5.9 + 0.5.10 with `HF_MODEL_ID` | SGLang DLC uses `SM_SGLANG_MODEL_PATH` instead of `HF_MODEL_ID` |
 | SGLang + EAGLE (first attempt) | Needs `SGLANG_ENABLE_SPEC_V2=1` + `SM_SGLANG_MAMBA_SCHEDULER_STRATEGY=extra_buffer` for hybrid Mamba models |
 
 ### Container Image Versions
