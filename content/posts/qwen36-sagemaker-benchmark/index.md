@@ -273,6 +273,75 @@ A few notes:
 
 ---
 
+## Validating With AIPerf: What to Actually Expect in Production
+
+After finding the best configuration, I wanted to validate the numbers with something more rigorous than a homegrown Python load generator. SageMaker AI recently launched [AI Benchmark Jobs](https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-ai-now-supports-optimized-generative-ai-inference-recommendations/) — a managed service that runs [NVIDIA AIPerf](https://github.com/ai-dynamo/aiperf) against a deployed endpoint, measuring TTFT, inter-token latency, and throughput with statistical rigor.
+
+The setup is straightforward: you create a workload config specifying the token distribution and concurrency, then point a benchmark job at your running endpoint.
+
+```python
+# Define the workload
+sm.create_ai_workload_config(
+    AIWorkloadConfigName="short-prompt-benchmark",
+    AIWorkloadConfigs={"WorkloadSpec": {"Inline": json.dumps({
+        "benchmark": {"type": "aiperf"},
+        "parameters": {
+            "prompt_input_tokens_mean": 50,
+            "output_tokens_mean": 50,
+            "extra_inputs": "ignore_eos:true",
+            "concurrency": 32,
+            "request_count": 300,
+        }
+    })}}
+)
+
+# Run the benchmark against your deployed endpoint
+sm.create_ai_benchmark_job(
+    AIBenchmarkJobName="qwen36-aiperf-short",
+    BenchmarkTarget={"Endpoint": {"Identifier": "your-endpoint-name"}},
+    OutputConfig={"S3OutputLocation": "s3://your-bucket/aiperf-results/"},
+    AIWorkloadConfigIdentifier="short-prompt-benchmark",
+    RoleArn=role,
+)
+```
+
+I ran AIPerf against our winning configuration (g7e.2xl + vLLM FP8 + MTP) with two workloads:
+
+### AIPerf Results — g7e.2xlarge, vLLM FP8, MTP
+
+| Metric | Short (50 tok out, conc=32) | Long gen (2048 tok out, conc=8) |
+|--------|---------------------------|-------------------------------|
+| **Request throughput** | 4.19 req/s | 0.25 req/s |
+| **Output token throughput** | 214 tok/s | 521 tok/s |
+| **TTFT p50** | 209 ms | 118 ms |
+| **Inter-token latency p50** | 21.6 ms | 14.0 ms |
+| **Output tok/s per user** | 46.3 | 71.2 |
+| **Request latency p50** | 1,331 ms | 29,060 ms |
+
+### Why the Numbers Differ From Our Manual Benchmark
+
+Our manual benchmark reported 44.82 req/s on the same hardware. AIPerf reports 4.19 req/s. That is a **10x difference** — and both numbers are correct. Here is why:
+
+1. **Our manual test used trivial prompts.** "What is machine learning? Explain briefly." with `max_tokens=50`. The model often produces a short answer (10-20 tokens) and hits the EOS token well before the 50-token limit. Each request completes in ~0.6 seconds. At concurrency 128, vLLM batches 128 of these lightweight requests and blasts through them.
+
+2. **AIPerf forces full token generation.** It sets `ignore_eos:true`, meaning the model must produce exactly ~50 tokens regardless of whether it would naturally stop. It also generates reasoning tokens (`<think>` blocks) — each request actually produces ~51 reasoning tokens plus content. And critically, AIPerf uses realistic synthetic prompts from the ShareGPT dataset rather than a single repeated prompt.
+
+3. **Concurrent request contention.** At concurrency 32, all requests compete for KV cache and GPU compute simultaneously. Our manual benchmark at concurrency 1 showed 0.635s per request; at concurrency 32, AIPerf shows 1.33s (2.1x slower per request, but 32x more concurrent — net 15x higher throughput than concurrency 1).
+
+The AIPerf numbers are closer to what a production deployment would see with diverse, real-world traffic. The manual benchmark numbers are useful for **relative comparisons** between configurations (g7e vs g6e, vLLM vs LMI), but the **absolute throughput** you should plan capacity around is the AIPerf number.
+
+### What to Expect for Mixed, Spiky Workloads
+
+For a production deployment serving a mix of short chatbot queries, medium code-generation requests, and occasional long-document tasks:
+
+- **Plan capacity around 200-500 output tokens/second** per g7e.2xlarge instance (not 44 req/s). The actual throughput depends on your output length distribution — short responses give higher req/s but the token budget is the same.
+- **TTFT will be 100-200ms at moderate load** (concurrency 8-16). At high concurrency (32+), some requests will queue and see TTFT in the seconds.
+- **Inter-token latency is rock-solid at ~14-22ms** regardless of load. Users see smooth streaming once the first token arrives.
+- **For traffic spikes**, SageMaker's autoscaling adds instances in minutes, not seconds. If you expect bursty traffic, keep a warm minimum instance count or use [async inference](https://docs.aws.amazon.com/sagemaker/latest/dg/async-inference.html) to queue requests during spikes.
+- **Cost at realistic throughput**: at ~214 output tok/s, each g7e.2xlarge produces ~770K tokens/hour at $2.49/hr — roughly **$0.003 per 1K output tokens**. This is competitive with managed API pricing for a 27B model.
+
+---
+
 ## Methodology and Caveats
 
 **Load generation.** Custom load generator sending OpenAI-compatible `/v1/chat/completions` requests. At concurrency N, exactly N requests are in flight at all times. Each level ran for 60 seconds after 3 warmup requests. Throughput = completed requests per second (failures excluded).
