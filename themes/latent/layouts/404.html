@@ -1,7 +1,7 @@
 {{ define "main" }}
-<section class="hero">
-    <h1>404</h1>
-    <p class="hero-subtitle">This page doesn't exist. Maybe it will someday.</p>
+<section class="error-page">
+    <div class="error-code">404</div>
+    <p class="error-message">This page doesn't exist. Maybe it will someday.</p>
 </section>
-<a href="{{ "/" | absURL }}" class="back-link">← Back to the blog</a>
+<a href="{{ "/" | absURL }}" class="back-link">&larr; Back to the blog</a>
 {{ end }}

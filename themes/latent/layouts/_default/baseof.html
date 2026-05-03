@@ -4,6 +4,8 @@
     {{ partial "head.html" . }}
 </head>
 <body>
+    <div class="grain-overlay" aria-hidden="true"></div>
+    <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
     {{ partial "header.html" . }}
     <main class="container">
         {{ block "main" . }}{{ end }}

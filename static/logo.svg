@@ -1,55 +1,55 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
     <radialGradient id="bg-glow" cx="50%" cy="45%" r="50%">
-      <stop offset="0%" stop-color="#0d2d2a"/>
-      <stop offset="100%" stop-color="#08090a"/>
+      <stop offset="0%" stop-color="#0f1f1a"/>
+      <stop offset="100%" stop-color="#0b0c0f"/>
     </radialGradient>
     <filter id="glow">
-      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
 
   <!-- Background -->
   <circle cx="256" cy="256" r="248" fill="url(#bg-glow)"/>
-  <circle cx="256" cy="256" r="248" fill="none" stroke="#5eead4" stroke-width="2" opacity="0.3"/>
+  <circle cx="256" cy="256" r="248" fill="none" stroke="#64d8a8" stroke-width="1.5" opacity="0.25"/>
 
-  <!-- Connections: input → latent -->
-  <line x1="118" y1="120" x2="236" y2="175" stroke="#5eead4" stroke-width="1.8" opacity="0.25"/>
-  <line x1="118" y1="120" x2="236" y2="280" stroke="#5eead4" stroke-width="1.2" opacity="0.1"/>
-  <line x1="118" y1="225" x2="236" y2="175" stroke="#5eead4" stroke-width="1.8" opacity="0.2"/>
-  <line x1="118" y1="225" x2="236" y2="280" stroke="#5eead4" stroke-width="1.8" opacity="0.25"/>
-  <line x1="118" y1="330" x2="236" y2="175" stroke="#5eead4" stroke-width="1.2" opacity="0.1"/>
-  <line x1="118" y1="330" x2="236" y2="280" stroke="#5eead4" stroke-width="1.8" opacity="0.2"/>
+  <!-- Connections: input to latent -->
+  <line x1="118" y1="120" x2="236" y2="175" stroke="#64d8a8" stroke-width="1.2" opacity="0.2"/>
+  <line x1="118" y1="120" x2="236" y2="280" stroke="#64d8a8" stroke-width="0.8" opacity="0.08"/>
+  <line x1="118" y1="225" x2="236" y2="175" stroke="#64d8a8" stroke-width="1.2" opacity="0.15"/>
+  <line x1="118" y1="225" x2="236" y2="280" stroke="#64d8a8" stroke-width="1.2" opacity="0.2"/>
+  <line x1="118" y1="330" x2="236" y2="175" stroke="#64d8a8" stroke-width="0.8" opacity="0.08"/>
+  <line x1="118" y1="330" x2="236" y2="280" stroke="#64d8a8" stroke-width="1.2" opacity="0.15"/>
 
-  <!-- Connections: latent → output -->
-  <line x1="276" y1="175" x2="394" y2="120" stroke="#5eead4" stroke-width="1.8" opacity="0.25"/>
-  <line x1="276" y1="175" x2="394" y2="225" stroke="#5eead4" stroke-width="1.8" opacity="0.2"/>
-  <line x1="276" y1="175" x2="394" y2="330" stroke="#5eead4" stroke-width="1.2" opacity="0.1"/>
-  <line x1="276" y1="280" x2="394" y2="120" stroke="#5eead4" stroke-width="1.2" opacity="0.1"/>
-  <line x1="276" y1="280" x2="394" y2="225" stroke="#5eead4" stroke-width="1.8" opacity="0.2"/>
-  <line x1="276" y1="280" x2="394" y2="330" stroke="#5eead4" stroke-width="1.8" opacity="0.25"/>
+  <!-- Connections: latent to output -->
+  <line x1="276" y1="175" x2="394" y2="120" stroke="#64d8a8" stroke-width="1.2" opacity="0.2"/>
+  <line x1="276" y1="175" x2="394" y2="225" stroke="#64d8a8" stroke-width="1.2" opacity="0.15"/>
+  <line x1="276" y1="175" x2="394" y2="330" stroke="#64d8a8" stroke-width="0.8" opacity="0.08"/>
+  <line x1="276" y1="280" x2="394" y2="120" stroke="#64d8a8" stroke-width="0.8" opacity="0.08"/>
+  <line x1="276" y1="280" x2="394" y2="225" stroke="#64d8a8" stroke-width="1.2" opacity="0.15"/>
+  <line x1="276" y1="280" x2="394" y2="330" stroke="#64d8a8" stroke-width="1.2" opacity="0.2"/>
 
   <!-- Input layer nodes -->
-  <circle cx="118" cy="120" r="14" fill="#5eead4" opacity="0.45"/>
-  <circle cx="118" cy="225" r="14" fill="#5eead4" opacity="0.45"/>
-  <circle cx="118" cy="330" r="14" fill="#5eead4" opacity="0.45"/>
+  <circle cx="118" cy="120" r="12" fill="#64d8a8" opacity="0.35"/>
+  <circle cx="118" cy="225" r="12" fill="#64d8a8" opacity="0.35"/>
+  <circle cx="118" cy="330" r="12" fill="#64d8a8" opacity="0.35"/>
 
-  <!-- Latent layer nodes (larger, glowing) -->
-  <circle cx="256" cy="175" r="24" fill="#5eead4" opacity="0.1"/>
-  <circle cx="256" cy="175" r="16" fill="#5eead4" opacity="0.75" filter="url(#glow)">
-    <animate attributeName="opacity" values="0.75;1;0.75" dur="3s" repeatCount="indefinite"/>
+  <!-- Latent layer nodes -->
+  <circle cx="256" cy="175" r="20" fill="#64d8a8" opacity="0.06"/>
+  <circle cx="256" cy="175" r="14" fill="#64d8a8" opacity="0.7" filter="url(#glow)">
+    <animate attributeName="opacity" values="0.7;0.95;0.7" dur="4s" repeatCount="indefinite"/>
   </circle>
-  <circle cx="256" cy="280" r="24" fill="#5eead4" opacity="0.1"/>
-  <circle cx="256" cy="280" r="16" fill="#5eead4" opacity="0.75" filter="url(#glow)">
-    <animate attributeName="opacity" values="0.75;1;0.75" dur="3s" begin="1.5s" repeatCount="indefinite"/>
+  <circle cx="256" cy="280" r="20" fill="#64d8a8" opacity="0.06"/>
+  <circle cx="256" cy="280" r="14" fill="#64d8a8" opacity="0.7" filter="url(#glow)">
+    <animate attributeName="opacity" values="0.7;0.95;0.7" dur="4s" begin="2s" repeatCount="indefinite"/>
   </circle>
 
   <!-- Output layer nodes -->
-  <circle cx="394" cy="120" r="14" fill="#5eead4" opacity="0.45"/>
-  <circle cx="394" cy="225" r="14" fill="#5eead4" opacity="0.45"/>
-  <circle cx="394" cy="330" r="14" fill="#5eead4" opacity="0.45"/>
+  <circle cx="394" cy="120" r="12" fill="#64d8a8" opacity="0.35"/>
+  <circle cx="394" cy="225" r="12" fill="#64d8a8" opacity="0.35"/>
+  <circle cx="394" cy="330" r="12" fill="#64d8a8" opacity="0.35"/>
 
-  <!-- DG text below the network -->
-  <text x="256" y="420" text-anchor="middle" font-family="'Space Mono', monospace" font-weight="700" font-size="64" fill="#5eead4" opacity="0.6" letter-spacing="8">DG</text>
+  <!-- DG text -->
+  <text x="256" y="420" text-anchor="middle" font-family="Georgia, serif" font-weight="400" font-size="60" fill="#64d8a8" opacity="0.5" letter-spacing="10">DG</text>
 </svg>

@@ -8,8 +8,8 @@
         <img src="{{ "logo.svg" | absURL }}" alt="" class="hero-logo" aria-hidden="true">
     </div>
     <div class="search-wrap">
-        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="search" class="search-input" placeholder="Search posts…" autocomplete="off" aria-label="Search posts">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="search" class="search-input" placeholder="Search posts..." autocomplete="off" aria-label="Search posts">
         <kbd class="search-kbd">/</kbd>
     </div>
 </section>
@@ -20,14 +20,19 @@
        data-title="{{ .Title | lower }}"
        data-tags="{{ delimit .Params.tags "," | lower }}"
        data-summary="{{ .Params.summary | lower }}">
-        <div class="post-meta">
-            <span class="post-date">{{ .Date.Format "Jan 2, 2006" }}</span>
-            <div class="post-tags">
-                {{ range .Params.tags }}<span class="post-tag">{{ . }}</span>{{ end }}
+        <div class="post-card-inner">
+            <div>
+                <div class="post-meta">
+                    <span class="post-date">{{ .Date.Format "Jan 2, 2006" }}</span>
+                    <div class="post-tags">
+                        {{ range .Params.tags }}<span class="post-tag">{{ . }}</span>{{ end }}
+                    </div>
+                </div>
+                <div class="post-title">{{ .Title }}</div>
+                {{ with .Params.summary }}<div class="post-summary">{{ . }}</div>{{ end }}
             </div>
+            <span class="post-arrow" aria-hidden="true">&rarr;</span>
         </div>
-        <div class="post-title">{{ .Title }}</div>
-        {{ with .Params.summary }}<div class="post-summary">{{ . }}</div>{{ end }}
     </a>
     {{ end }}
 </section>
@@ -36,23 +41,22 @@
 
 <script>
 (function() {
-    const input = document.getElementById('search');
-    const posts = document.querySelectorAll('.post-card');
-    const noResults = document.getElementById('no-results');
+    var input = document.getElementById('search');
+    var posts = document.querySelectorAll('.post-card');
+    var noResults = document.getElementById('no-results');
 
     input.addEventListener('input', function() {
-        const q = this.value.toLowerCase().trim();
-        let visible = 0;
-        posts.forEach(card => {
-            const haystack = card.dataset.title + ' ' + card.dataset.tags + ' ' + card.dataset.summary;
-            const show = !q || haystack.includes(q);
+        var q = this.value.toLowerCase().trim();
+        var visible = 0;
+        posts.forEach(function(card) {
+            var haystack = card.dataset.title + ' ' + card.dataset.tags + ' ' + card.dataset.summary;
+            var show = !q || haystack.indexOf(q) !== -1;
             card.style.display = show ? '' : 'none';
             if (show) visible++;
         });
         noResults.hidden = visible > 0;
     });
 
-    // Focus search on "/" key
     document.addEventListener('keydown', function(e) {
         if (e.key === '/' && document.activeElement !== input) {
             e.preventDefault();
