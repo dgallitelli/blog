@@ -1,5 +1,6 @@
 {{ define "main" }}
 <section class="hero">
+    <div class="hero-eyebrow">Journal of AI, ML &amp; Cloud Architecture</div>
     <div class="hero-top">
         <div class="hero-text">
             <h1>{{ .Site.Title }}</h1>
@@ -9,13 +10,19 @@
     </div>
     <div class="search-wrap">
         <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="search" class="search-input" placeholder="Search posts..." autocomplete="off" aria-label="Search posts">
+        <input type="text" id="search" class="search-input" placeholder="Search posts, tags, topics…" autocomplete="off" aria-label="Search posts">
         <kbd class="search-kbd">/</kbd>
     </div>
 </section>
 
+{{ $posts := sort (where .Site.RegularPages "Params.hidden" "ne" true) "Date" "desc" }}
+<div class="posts-header">
+    <span class="posts-label">All entries</span>
+    <span class="posts-count">{{ len $posts }} posts</span>
+</div>
+
 <section class="posts" id="posts">
-    {{ range sort (where .Site.RegularPages "Params.hidden" "ne" true) "Date" "desc" }}
+    {{ range $posts }}
     <a class="post-card" href="{{ .RelPermalink }}"
        data-title="{{ .Title | lower }}"
        data-tags="{{ delimit .Params.tags "," | lower }}"
@@ -24,9 +31,14 @@
             <div>
                 <div class="post-meta">
                     <span class="post-date">{{ .Date.Format "Jan 2, 2006" }}</span>
+                    <span class="post-meta-dot" aria-hidden="true"></span>
+                    <span class="post-reading-time">{{ .ReadingTime }} min</span>
+                    {{ with .Params.tags }}
+                    <span class="post-meta-dot" aria-hidden="true"></span>
                     <div class="post-tags">
-                        {{ range .Params.tags }}<span class="post-tag">{{ . }}</span>{{ end }}
+                        {{ range first 3 . }}<span class="post-tag">{{ . }}</span>{{ end }}
                     </div>
+                    {{ end }}
                 </div>
                 <div class="post-title">{{ .Title }}</div>
                 {{ with .Params.summary }}<div class="post-summary">{{ . }}</div>{{ end }}
