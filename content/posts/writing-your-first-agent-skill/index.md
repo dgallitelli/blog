@@ -683,7 +683,3 @@ The hard part isn't the tooling. It's writing good instructions — the same cha
 - [mcp-proxy-for-aws — IAM-authenticated MCP client](https://github.com/aws/mcp-proxy-for-aws)
 - [Example skills repository (Anthropic)](https://github.com/anthropics/skills)
 - [Agent Skills reference library](https://github.com/agentskills/agentskills)
-
----
-
-*Davide Gallitelli is a Specialist Solutions Architect for AI/ML at Amazon Web Services, covering Southeast Asia.*

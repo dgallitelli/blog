@@ -411,5 +411,3 @@ But the foundations are being laid quickly, and the research surface area has ex
 - [LLM-JEPA](https://arxiv.org/abs/2509.14252) — JEPA for language model training (Huang, LeCun, Balestriero, 2025)
 - [TS-JEPA](https://arxiv.org/abs/2509.25449) — JEPA for time series (Ennadir et al., NeurIPS 2024 Workshop)
 - [JEPA-Reasoner](https://arxiv.org/abs/2512.19171) — decoupling reasoning from generation (Liu et al., 2025)
-
-*Davide Gallitelli is a Specialist Solutions Architect for AI/ML at Amazon Web Services, based in France.*

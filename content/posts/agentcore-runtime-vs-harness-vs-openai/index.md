@@ -484,7 +484,3 @@ The April announcements set the foundation. Here's what's on the horizon:
 - [OpenAI on Amazon Bedrock announcement](https://aws.amazon.com/blogs/aws/openai-on-amazon-bedrock/)
 - [AgentCore pricing page](https://aws.amazon.com/bedrock/agentcore/pricing/)
 - [Strands Agents open-source framework](https://strandsagents.com)
-
----
-
-*Davide Gallitelli is a Senior Specialist Solutions Architect at AWS, focused on AI/ML infrastructure.*

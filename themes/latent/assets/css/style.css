@@ -566,6 +566,28 @@ a:hover { opacity: 0.85; }
     flex-wrap: wrap;
     row-gap: 0.5rem;
 }
+.post-byline {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-top: 1.25rem;
+    font-size: 0.82rem;
+    color: var(--text-tertiary);
+}
+.post-byline-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    object-fit: cover;
+    display: block;
+    background: var(--border);
+}
+.post-byline-name {
+    color: var(--text);
+    font-weight: 500;
+    letter-spacing: -0.005em;
+}
 .post-reading-time {
     color: var(--text-tertiary);
     font-family: var(--font-mono);

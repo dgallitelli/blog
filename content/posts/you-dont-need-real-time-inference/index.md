@@ -566,7 +566,3 @@ Next time you find yourself building an async service layer with retry logic and
 - [Scale an endpoint to zero instances](https://docs.aws.amazon.com/sagemaker/latest/dg/endpoint-auto-scaling-zero-instances.html)
 - [SageMaker Pipelines — TransformStep](https://docs.aws.amazon.com/sagemaker/latest/dg/build-and-manage-steps.html#step-type-transform)
 - [Inference cost optimization best practices](https://docs.aws.amazon.com/sagemaker/latest/dg/inference-cost-optimization.html)
-
----
-
-*Davide Gallitelli is a Specialist Solutions Architect for AI/ML at Amazon Web Services, covering Southeast Asia.*

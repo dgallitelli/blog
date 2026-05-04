@@ -5,6 +5,15 @@
             {{ if .Params.series }}{{ .Params.series }}{{ else }}Essay{{ end }}
         </div>
         <h1>{{ .Title }}</h1>
+        <div class="post-byline">
+            <img class="post-byline-avatar"
+                 src="https://github.com/dgallitelli.png?size=56"
+                 alt="{{ .Site.Params.author }}"
+                 width="28" height="28"
+                 loading="lazy"
+                 referrerpolicy="no-referrer">
+            <span class="post-byline-name">{{ .Site.Params.author }}</span>
+        </div>
         <div class="post-meta">
             <span class="post-date">{{ .Date.Format "January 2, 2006" }}</span>
             <span class="post-meta-dot" aria-hidden="true"></span>
