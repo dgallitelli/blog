@@ -1,0 +1,137 @@
+{
+  "data": [
+    {
+      "x": [1200],
+      "y": [79.3],
+      "text": ["ViT-H/14 (300ep)"],
+      "name": "I-JEPA",
+      "mode": "markers+text",
+      "textposition": "top center",
+      "marker": {
+        "size": 14,
+        "color": "#0984e3",
+        "symbol": "circle",
+        "line": {"width": 2, "color": "#074b83"}
+      },
+      "textfont": {"size": 11, "color": "#0984e3"}
+    },
+    {
+      "x": [10000],
+      "y": [77.2],
+      "text": ["ViT-H/14 (1600ep)"],
+      "name": "MAE",
+      "mode": "markers+text",
+      "textposition": "bottom center",
+      "marker": {
+        "size": 14,
+        "color": "#e17055",
+        "symbol": "square",
+        "line": {"width": 2, "color": "#a0522d"}
+      },
+      "textfont": {"size": 11, "color": "#e17055"}
+    },
+    {
+      "x": [5000],
+      "y": [78.1],
+      "text": ["ViT-L/16 (1600ep)"],
+      "name": "CAE",
+      "mode": "markers+text",
+      "textposition": "top right",
+      "marker": {
+        "size": 14,
+        "color": "#636e72",
+        "symbol": "diamond",
+        "line": {"width": 2, "color": "#2d3436"}
+      },
+      "textfont": {"size": 11, "color": "#636e72"}
+    },
+    {
+      "x": [8000],
+      "y": [77.3],
+      "text": ["ViT-L/16 (1600ep)"],
+      "name": "data2vec",
+      "mode": "markers+text",
+      "textposition": "top center",
+      "marker": {
+        "size": 14,
+        "color": "#fdcb6e",
+        "symbol": "triangle-up",
+        "line": {"width": 2, "color": "#c8a415"}
+      },
+      "textfont": {"size": 11, "color": "#c8a415"}
+    },
+    {
+      "x": [1500],
+      "y": [77.5],
+      "text": ["ViT-S/16 (800ep)"],
+      "name": "iBOT",
+      "mode": "markers+text",
+      "textposition": "bottom right",
+      "marker": {
+        "size": 14,
+        "color": "#00b894",
+        "symbol": "triangle-down",
+        "line": {"width": 2, "color": "#007a63"}
+      },
+      "textfont": {"size": 11, "color": "#00b894"}
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "ImageNet-1K Linear Evaluation vs Pretraining GPU Hours",
+      "font": {"size": 16}
+    },
+    "xaxis": {
+      "title": {"text": "Pretraining GPU Hours"},
+      "type": "log",
+      "range": [2.8, 4.2],
+      "gridcolor": "rgba(128,128,128,0.2)",
+      "tickvals": [1000, 2000, 5000, 10000],
+      "ticktext": ["1,000", "2,000", "5,000", "10,000"]
+    },
+    "yaxis": {
+      "title": {"text": "Top-1 Accuracy (%)"},
+      "range": [76, 82],
+      "gridcolor": "rgba(128,128,128,0.2)"
+    },
+    "legend": {
+      "x": 0.02,
+      "y": 0.98,
+      "bgcolor": "rgba(255,255,255,0.7)",
+      "bordercolor": "rgba(0,0,0,0.1)",
+      "borderwidth": 1
+    },
+    "annotations": [
+      {
+        "x": 3.08,
+        "y": 79.3,
+        "ax": 60,
+        "ay": 40,
+        "text": "I-JEPA reaches ~79% Top-1<br>at ~1,200 GPU hours",
+        "showarrow": true,
+        "arrowhead": 2,
+        "arrowcolor": "#0984e3",
+        "font": {"size": 10, "color": "#0984e3"},
+        "bgcolor": "rgba(9,132,227,0.08)",
+        "borderpad": 4
+      },
+      {
+        "x": 4.0,
+        "y": 77.2,
+        "ax": -60,
+        "ay": -40,
+        "text": "MAE reaches 77% Top-1<br>at ~10,000 GPU hours",
+        "showarrow": true,
+        "arrowhead": 2,
+        "arrowcolor": "#e17055",
+        "font": {"size": 10, "color": "#e17055"},
+        "bgcolor": "rgba(225,112,85,0.08)",
+        "borderpad": 4
+      }
+    ],
+    "margin": {"l": 60, "r": 30, "t": 50, "b": 60},
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {"family": "Geist, sans-serif"}
+  }
+}
