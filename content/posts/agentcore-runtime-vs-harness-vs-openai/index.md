@@ -25,6 +25,8 @@ Enterprise architects now face a three-way fork. Each option sits at a different
 
 ## The Three Execution Models at a Glance
 
+Before we compare the three, a terminology note. The **agent loop** is the core reasoning cycle: the model generates a response, decides to call a tool, receives the result, and reasons again — repeat until done. An **agent harness** is the infrastructure that *manages* that loop: tool routing, streaming, error recovery, context management, and observability. You can write your own harness (that's what frameworks like LangGraph, CrewAI, and Strands Agents give you), or you can use a managed one. The three execution models below differ primarily in who provides the harness — you, AWS, or OpenAI.
+
 The fundamental question is: *who runs the agent loop?* The model-tool-model cycle that turns a single LLM call into a multi-step reasoning agent — who owns that code?
 
 ```mermaid
