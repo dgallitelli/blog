@@ -45,7 +45,7 @@ block-beta
     block:managed:1
         columns 1
         m_title["Managed Agents"]
-        m_desc["OpenAI runs the loop"]
+        m_desc["OpenAI's harness, on AWS"]
         m_detail["OpenAI frontier models"]
     end
 
@@ -68,7 +68,7 @@ Here's the comparison across every axis that matters for an architectural decisi
 | Aspect | Runtime | Harness | Managed Agents (OpenAI) |
 |---|---|---|---|
 | What you deploy | Container (ECR) or source code (S3) | Configuration (model + tools + prompt) | Configuration (limited preview) |
-| Who runs the agent loop | Your code | AWS (Strands Agents, per AWS docs) | OpenAI's agent harness |
+| Who runs the agent loop | Your code | AWS (Strands Agents, per AWS docs) | OpenAI's harness, managed by AWS on Bedrock |
 | Models supported | Any (your code calls them) | Bedrock + OpenAI + Gemini | OpenAI frontier (GPT-5.5, GPT-5.4) |
 | Per-call model/tool override | No (baked into your code) | Yes | TBD |
 | Protocols | HTTP, MCP, A2A, AG-UI | AWS API only (`InvokeHarness`) | OpenAI-compatible APIs |
@@ -273,7 +273,7 @@ That last one deserves attention. Inline functions let the Harness *pause* execu
 
 Announced April 28, 2026 at "What's Next with AWS" — this is the product of the $50 billion Amazon investment in OpenAI. The premise: use OpenAI's own agent harness, engineered to unlock the full potential of OpenAI frontier models (GPT-5.5, GPT-5.4), running on AgentCore compute with all inference flowing through Bedrock.
 
-This is architecturally distinct from using Harness with an OpenAI model configuration. Harness uses AWS's agent loop (Strands) with OpenAI models. Managed Agents uses *OpenAI's* agent loop with OpenAI models. The orchestration is model-provider-optimized — the agent harness is built by the same team that built the models.
+This is architecturally distinct from using Harness with an OpenAI model configuration. Harness uses AWS's agent loop (Strands) with OpenAI models. Managed Agents uses *OpenAI's* agent harness — their orchestration logic, built by the same team that built the models — but it runs as a managed runtime within AWS infrastructure, with all inference on Bedrock. OpenAI designed the harness; AWS operates it.
 
 ```mermaid
 flowchart LR
@@ -336,7 +336,7 @@ flowchart TB
     end
 
     subgraph ManagedBlock["Managed Agents"]
-        M_Loop["OpenAI agent harness<br/>(managed by OpenAI)"]
+        M_Loop["OpenAI agent harness<br/>(run by AWS on Bedrock)"]
         M_Models["GPT-5.5 / GPT-5.4<br/>(OpenAI frontier)"]
         M_Tools["TBD"]
     end
