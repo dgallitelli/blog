@@ -2,12 +2,15 @@
 title: "World Models: From Cognitive Science to Biological Simulation"
 date: 2026-04-27
 tags: ["world-models", "deep-learning", "transformers", "JEPA", "computational-biology", "deep-research"]
+series: "World Models"
 summary: "A comprehensive survey of world models — from Ha & Schmidhuber's dream-training agents to AlphaFold, Evo 2, and the AI Virtual Cell. Covering three architectural generations, the JEPA debate, and how biology is recapitulating AI's history."
 ---
 
 World models — learned internal representations that simulate environment dynamics and enable prediction, planning, and imagination — have emerged as one of the most consequential ideas in modern AI. Rooted in Kenneth Craik's 1943 theory of mental models and formalized through Sutton's Dyna architecture (1991), they've undergone a dramatic transformation since Ha and Schmidhuber's seminal 2018 paper demonstrated agents training entirely inside hallucinated dreams [1].
 
 This post surveys the full landscape: three architectural generations of world models, the composite architecture pattern, the JEPA vs. generative debate, and how these same ideas are revolutionizing our understanding of living systems — from protein folding to virtual cells. It draws on 64+ sources across arXiv, NeurIPS, ICLR, Nature, and industry publications.
+
+> *This is Part 1 of 2 in the World Models series. Part 2 is a technical deep dive into [JEPA](../part2-jepa-deep-dive/), the architecture behind LeCun's vision.*
 
 ---
 

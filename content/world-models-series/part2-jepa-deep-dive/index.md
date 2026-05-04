@@ -2,11 +2,14 @@
 title: "JEPA: The Architecture Behind LeCun's Vision for World Models"
 date: 2026-05-04
 tags: ["JEPA", "world-models", "self-supervised-learning", "representation-learning", "LeCun"]
+series: "World Models"
 summary: "JEPA predicts in latent space, not pixel space. That one difference underpins Yann LeCun's entire blueprint for machines that learn world models, plan hierarchically, and reason by simulation."
 plotly: true
 ---
 
 *JEPA predicts in latent space, not pixel space. That one difference underpins Yann LeCun's entire blueprint for machines that learn world models, plan hierarchically, and reason by simulation. Here's what JEPA actually is, where it's been applied, and what's still missing.*
+
+> *This is Part 2 of 2 in the World Models series. [Part 1](../part1-from-cognitive-science-to-biology/) is a broad survey across three architectural generations and the biology crossover; this post is the technical deep dive on JEPA.*
 
 ![An abstract landscape of interconnected geometric shapes floating in space](https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=1200&auto=format&fit=crop&q=80)
 *Photo by [Milad Fakurian](https://unsplash.com/@fakurian) on [Unsplash](https://unsplash.com)*
