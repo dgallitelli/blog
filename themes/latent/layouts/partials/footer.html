@@ -12,21 +12,143 @@
 {{ if .Store.Get "hasMermaid" }}
 <script type="module">
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-mermaid.initialize({
-    startOnLoad: true,
-    theme: 'dark',
-    themeVariables: {
-        primaryColor: '#1e293b',
-        primaryTextColor: '#e0e0e0',
-        primaryBorderColor: '#64d8a8',
-        lineColor: '#64d8a8',
-        secondaryColor: '#141414',
-        tertiaryColor: '#1a1a2e',
-        fontFamily: 'Geist, sans-serif',
-        fontSize: '14px'
+
+// Theme-aware Mermaid config. Using 'base' with explicit variables guarantees
+// that every surface (nodes, clusters/subgraphs, edges, labels, notes) picks
+// colors from the same palette — 'dark' leaves clusterBkg and a few label
+// colors derived from defaults, which breaks contrast on our darker page.
+function paletteFor(theme) {
+    const dark = {
+        background: '#0b0c0f',
+        mainBkg: '#1a1d24',           // node fill
+        nodeBorder: '#3a3f4a',
+        nodeTextColor: '#f1eee4',
+        clusterBkg: '#14161d',        // subgraph fill (was pale blue)
+        clusterBorder: '#2a2e37',
+        titleColor: '#f1eee4',        // subgraph title text
+        lineColor: '#7dd4aa',
+        edgeLabelBackground: '#14161d',
+        labelTextColor: '#d4d1c7',
+        noteBkgColor: '#1a1d24',
+        noteTextColor: '#f1eee4',
+        noteBorderColor: '#7dd4aa',
+        primaryColor: '#1a1d24',
+        primaryTextColor: '#f1eee4',
+        primaryBorderColor: '#3a3f4a',
+        secondaryColor: '#202430',
+        secondaryTextColor: '#f1eee4',
+        secondaryBorderColor: '#3a3f4a',
+        tertiaryColor: '#242836',
+        tertiaryTextColor: '#f1eee4',
+        tertiaryBorderColor: '#3a3f4a'
+    };
+    const light = {
+        background: '#f4f1ea',
+        mainBkg: '#ffffff',
+        nodeBorder: '#c9c5b8',
+        nodeTextColor: '#15130f',
+        clusterBkg: '#ece9e1',
+        clusterBorder: '#c9c5b8',
+        titleColor: '#15130f',
+        lineColor: '#1a6e4d',
+        edgeLabelBackground: '#f4f1ea',
+        labelTextColor: '#2a2824',
+        noteBkgColor: '#ffffff',
+        noteTextColor: '#15130f',
+        noteBorderColor: '#1a6e4d',
+        primaryColor: '#ffffff',
+        primaryTextColor: '#15130f',
+        primaryBorderColor: '#c9c5b8',
+        secondaryColor: '#ece9e1',
+        secondaryTextColor: '#15130f',
+        secondaryBorderColor: '#c9c5b8',
+        tertiaryColor: '#e0ddd3',
+        tertiaryTextColor: '#15130f',
+        tertiaryBorderColor: '#c9c5b8'
+    };
+    return theme === 'light' ? light : dark;
+}
+
+function initMermaid() {
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'loose',
+        theme: 'base',
+        themeVariables: Object.assign({
+            fontFamily: 'Geist, sans-serif',
+            fontSize: '14px'
+        }, paletteFor(theme))
+    });
+}
+
+async function renderAll() {
+    const nodes = document.querySelectorAll('.mermaid');
+    for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        // Preserve the source so we can re-render on theme change.
+        if (!n.dataset.source) n.dataset.source = n.textContent;
+        n.removeAttribute('data-processed');
+        n.innerHTML = n.dataset.source;
+    }
+    initMermaid();
+    await mermaid.run({ nodes });
+
+    // Strip author-written inline style attributes from cluster (subgraph)
+    // rects/paths, which commonly use hard-coded pastel fills that defeat
+    // theming and produce white-on-white/white-on-light-blue text. This
+    // preserves author intent on *node* styling (keeping highlight colors)
+    // while restoring themed panels for subgraphs.
+    document.querySelectorAll('.mermaid svg .cluster > rect, .mermaid svg .cluster > path, .mermaid svg g.cluster rect, .mermaid svg g.cluster path').forEach(el => {
+        el.removeAttribute('style');
+        el.removeAttribute('fill');
+        el.removeAttribute('stroke');
+    });
+}
+
+renderAll();
+
+// Re-render on theme toggle so colors match the current palette.
+const mo = new MutationObserver(function(muts) {
+    for (const m of muts) {
+        if (m.type === 'attributes' && m.attributeName === 'data-theme') {
+            renderAll();
+            return;
+        }
     }
 });
+mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 </script>
+<style>
+/* Subgraph (cluster) panels: fall back to themed fill once inline
+   author styles are stripped by the renderAll() post-processor. */
+.mermaid svg .cluster > rect,
+.mermaid svg g.cluster > rect,
+.mermaid svg .cluster > path,
+.mermaid svg g.cluster > path {
+    fill: var(--bg-elevated) !important;
+    stroke: var(--border-strong) !important;
+    stroke-width: 1px !important;
+}
+/* Subgraph title text — mermaid renders it as a foreignObject. Force
+   heading contrast so titles are legible in both themes. */
+.mermaid .cluster-label foreignObject,
+.mermaid .cluster-label foreignObject div,
+.mermaid .cluster-label foreignObject span,
+.mermaid .cluster-label p,
+.mermaid .cluster-label text {
+    color: var(--text-heading) !important;
+    fill: var(--text-heading) !important;
+}
+/* Edge labels — keep them on a themed background so they never read as
+   floating text on transparent svg. */
+.mermaid .edgeLabel,
+.mermaid .edgeLabel rect,
+.mermaid .edgeLabel foreignObject > div {
+    background: var(--bg-elevated) !important;
+    color: var(--text) !important;
+}
+</style>
 {{ end }}
 <script>
 (function () {
