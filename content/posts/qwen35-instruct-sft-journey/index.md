@@ -7,8 +7,8 @@ summary: "The Instruct recipes carried over from Base with one line changed. Siz
 
 *Eight recipe cells, one OOM that proved my napkin math wrong, and a stack of small gotchas in between.*
 
-![Welder working on a steel frame at night, sparks flying](https://images.unsplash.com/photo-1581094488379-6cf06ed26b58?w=1200&auto=format&fit=crop&q=80)
-*Photo by [Christopher Burns](https://unsplash.com/@christopher__burns) on [Unsplash](https://unsplash.com)*
+![Close-up of RAM modules and circuit boards in green and blue](https://images.unsplash.com/photo-1644818749896-3a18bf68ec4a?w=1200&auto=format&fit=crop&q=80)
+*Photo from [Unsplash](https://unsplash.com)*
 
 ---
 
