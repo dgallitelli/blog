@@ -5,7 +5,7 @@ tags: ["SageMaker", "fine-tuning", "QLoRA", "DeepSpeed", "ZeRO-3", "Qwen", "PEFT
 summary: "The Instruct recipes carried over from Base with one line changed. Sizing the GPUs didn't — 4xL40S OOMs on 9B full SFT, and g7e.12xlarge is the cheapest box that actually fits."
 ---
 
-*Five recipes, one quota dance, and one OOM that proved my napkin math wrong.*
+*Eight recipe cells, one OOM that proved my napkin math wrong, and a stack of small gotchas in between.*
 
 ![Welder working on a steel frame at night, sparks flying](https://images.unsplash.com/photo-1581094488379-6cf06ed26b58?w=1200&auto=format&fit=crop&q=80)
 *Photo by [Christopher Burns](https://unsplash.com/@christopher__burns) on [Unsplash](https://unsplash.com)*
@@ -174,7 +174,7 @@ This is where I had to do the actual sizing work. SageMaker training has a long 
 
 † SageMaker training pricing, us-east-1. Re-verify against the [AWS pricing page](https://aws.amazon.com/sagemaker/pricing/) before treating any of these as authoritative — they drift.
 
-The original full-SFT recipes pointed at `p4d.24xlarge` and were marked "Not yet tested" — partly because p4d is expensive and hard to get capacity for. Given the napkin math (4B full SFT needs ~64 GB; 9B needs ~144 GB pre-shard), **g7e.2xlarge** ought to fit a 4B full-FT comfortably on one Blackwell GPU, and **g7e.12xlarge** ought to fit a 9B full-FT on 4×Blackwell. **g6e.12xlarge** at 192 GB total looked plausible for 9B too — and at half the price of g7e.12xlarge.
+The original full-SFT recipes pointed at `p4d.24xlarge` and were marked "Not yet tested." Given the napkin math (4B full SFT needs ~64 GB; 9B needs ~144 GB pre-shard), **g7e.2xlarge** ought to fit a 4B full-FT comfortably on one Blackwell GPU, and **g7e.12xlarge** ought to fit a 9B full-FT on 4×Blackwell. **g6e.12xlarge** at 192 GB total looked plausible for 9B too — and at half the price of g7e.12xlarge.
 
 The matrix I wanted to validate:
 
@@ -186,9 +186,7 @@ The matrix I wanted to validate:
 | T4 | 9B Base | Full SFT | g6e.12xl | Replaces untested p4d default; cheaper than g7e.12xl |
 | T5 | 9B Instruct | Full SFT | g7e.12xl | Confirms 9B Instruct full SFT |
 
-Five jobs, in parallel. I figured this would take a few hours of wall-clock time with most of it spent on training — not on getting the jobs to start.
-
-I figured wrong.
+Five jobs, in parallel. Most of the wall-clock time should be in training itself.
 
 ---
 
@@ -204,77 +202,29 @@ Please ensure that the role exists and allows principal
 
 Right. EC2 instance roles aren't SageMaker execution roles — different trust policy. Found a pre-existing `AmazonSageMaker-ExecutionRole-...` in the account, passed it via `--role`, moved on. **Gotcha #5.**
 
-Second problem: `T5` came back with a different error:
-
-```
-ResourceLimitExceeded: account-level service limit
-'ml.g7e.12xlarge for training job usage' is 0 Instances
-```
-
-Quota wasn't set in this account. AWS Service Quotas with `request-service-quota-increase --quota-code L-99850E94 --desired-value 1`, and… **APPROVED in 8 seconds.** That was a pleasant surprise — I'd budgeted hours for that.
-
-Third problem: `T3` (4B Instruct full SFT on g7e.2xl) failed with:
-
-```
-ResourceLimitExceeded: 'ml.g7e.2xlarge for training job usage'
-is 1 Instances, with current utilization of 1 Instances
-```
-
-T2 was already eating the one g7e.2xl I was allowed. Bumped that quota to 2 — also approved instantly — and resubmitted T3.
-
-By the time everything was running, four of the five jobs were healthily training:
+Second problem: a couple of `ResourceLimitExceeded` errors on `g7e.2xlarge` and `g7e.12xlarge` — the SageMaker training quotas for those instance types weren't set in this account. AWS Service Quotas with `request-service-quota-increase --desired-value 1` (or 2, since one g7e.2xl was already busy), and the increases came through. Resubmitted, and the matrix was on its way:
 
 ```
 T1  4b /instruct/qlora on ml.g5.2xlarge      -> Training
 T2  4b /base    /full  on ml.g7e.2xlarge     -> Training
 T3  4b /instruct/full  on ml.g7e.2xlarge     -> Training
-T4  9b /base    /full  on ml.g6e.12xlarge    -> Pending (waiting for capacity)
+T4  9b /base    /full  on ml.g7e.12xlarge    -> Training
 T5  9b /instruct/full  on ml.g7e.12xlarge    -> Training
 ```
 
-Four down. **T4 sat in `Pending` — "Training job waiting for capacity"** — and stayed there for hours.
+Wall clock: T1 ~21 min, T2 ~29 min, T3 ~30 min, T4 ~49 min, T5 ~46 min — billable. Five cells, all green. The hypothesis held: **the existing recipes work for the Instruct variants with only `model_name_or_path` changed.** Same DLC, same dependency pins, same trainer, same `attn_implementation: sdpa`, same modality setting, same LoRA target modules — they all just work.
+
+A bit later I closed two more cells — 9B Instruct QLoRA on both `g5.2xl` and `g6e.2xl`, ~22-28 minutes each. Seven cells green.
+
+The eighth cell is where things got interesting.
 
 ---
 
-## Step 6: The Capacity Problem
+## Step 6: The g6e.12xl OOM
 
-g6e.12xlarge in `us-east-1` was apparently fully booked. The other four jobs all completed cleanly while T4 was still waiting:
+The README still listed `ml.g6e.12xlarge` (4× L40S 48 GB, 192 GB total) as "Not yet tested" for 9B full SFT. I had a hand-wavy claim from a few PRs back that 192 GB total was "tight but plausible." Time to verify — 192 GB is a lot of headroom on paper.
 
-| # | Status | Billable |
-|---|---|---|
-| T1 | ✓ Completed | ~21 min |
-| T2 | ✓ Completed | ~29 min |
-| T3 | ✓ Completed | ~30 min |
-| T4 | ⏳ Still pending capacity (>1h) | — |
-| T5 | ✓ Completed | ~46 min |
-
-I let it cook. After ~85 minutes of `Pending` I gave up on g6e.12xl in us-east-1 and submitted **T4.1** to **g7e.12xlarge** instead — the same instance type T5 had just used. That one trained in **~49 minutes** on the first try.
-
-So the validated matrix was:
-
-| # | Variant | Strategy | Instance | Billable |
-|---|---|---|---|---|
-| T1 | 4B Instruct | QLoRA | ml.g5.2xlarge | ~21 min |
-| T2 | 4B Base | Full SFT | ml.g7e.2xlarge | ~29 min |
-| T3 | 4B Instruct | Full SFT | ml.g7e.2xlarge | ~30 min |
-| **T4.1** | 9B Base | Full SFT | ml.g7e.12xlarge | **~49 min** |
-| T5 | 9B Instruct | Full SFT | ml.g7e.12xlarge | ~46 min |
-
-Five cells, all green. The hypothesis held: **the existing recipes work for the Instruct variants with only `model_name_or_path` changed.** No DLC, dependency, or trainer changes needed. Same `attn_implementation: sdpa`, same modality setting, same LoRA target modules — they all just work.
-
-A bit later I closed the last two cells (9B Instruct QLoRA on both g5.2xl and g6e.2xl) — both completed in ~22-28 minutes. Eight cells, all green.
-
----
-
-## Step 7: Then I Tried g6e.12xl Again
-
-Two follow-ups:
-1. The README still listed g6e.12xl as "Not yet tested" for 9B full SFT — a documented option we'd never confirmed.
-2. Several PRs ago I had a hand-wavy claim that 192 GB total was "tight but plausible" for 9B full SFT. Time to verify.
-
-I bumped a quota in `us-west-2` — same code (`L-F70A2467`), instantly APPROVED. Submitted **T4.3**: 9B Base full SFT on g6e.12xlarge in us-west-2. This time capacity was available immediately.
-
-It crashed at **456 seconds billable.**
+Submitted the eighth cell: 9B Base full SFT on `g6e.12xlarge`, default recipe. It crashed at **456 seconds billable.**
 
 ```
 torch.OutOfMemoryError: CUDA out of memory.
@@ -302,7 +252,7 @@ But the README isn't there to teach hyperparameter tuning — it's there to say 
 
 ---
 
-## Step 8: What's Actually Documented Now
+## Step 7: What's Actually Documented Now
 
 The validation matrix as it ended up:
 
@@ -335,8 +285,6 @@ A short index of the surprises I hit, in the order I hit them:
 4. **Pinning `CheckpointConfig.s3_uri` is a footgun.** The SDK auto-derives a per-run path; overriding it makes back-to-back runs collide and crash on optimizer-state restore.
 5. **EC2 instance roles aren't SageMaker execution roles.** They have a different trust policy. Need an actual `AmazonSageMaker-ExecutionRole-*`.
 6. **9B full SFT does not fit on 4×L40S (192 GB).** The recipe's defaults peak at ~43 GB/GPU during the backward pass; L40S has 48 GB nominal but only ~44 GB usable after CUDA overhead. Use g7e.12xl (4×96 GB Blackwell) or tune the recipe down.
-
-Bonus, free of charge: **AWS Service Quotas approved every quota request I made in <30 seconds.** This is not what I expected from past experience and I'm going to enjoy it while it lasts.
 
 ---
 
